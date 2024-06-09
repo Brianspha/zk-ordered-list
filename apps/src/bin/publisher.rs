@@ -27,10 +27,9 @@ use risc0_zkvm::{default_prover, ExecutorEnv, ProverOpts, VerifierContext};
 
 sol! {
     interface IOrderedList {
-        function set(string memory numbers, bytes calldata seal);
+        function set(uint256[] memory numbers, bytes calldata seal);
     }
 }
-
 /// Wrapper of a `SignerMiddleware` client to send transactions to the given
 /// contract's `Address`.
 pub struct TxSender {
@@ -94,7 +93,7 @@ struct Args {
 
     /// The input to provide to the guest binary
     #[clap(short, long)]
-    input:U256,
+    input: U256,
 }
 
 fn main() -> Result<()> {
@@ -134,13 +133,13 @@ fn main() -> Result<()> {
     // Decode Journal: Upon receiving the proof, the application decodes the journal to extract
     // the verified number. This ensures that the number being submitted to the blockchain matches
     // the number that was verified off-chain.
-    let numbers = <Vec<U256>>::abi_decode(&journal, true).context("decoding journal data")?;
+    let numbers:Vec<U256> = <Vec<U256>>::abi_decode(&journal, true).context("decoding journal data")?;
 
     // Construct function call: Using the IOrderedList interface, the application constructs
     // the ABI-encoded function call for the set function of the EvenNumber contract.
     // This call includes the verified number, the post-state digest, and the seal (proof).
     let calldata = IOrderedList::IOrderedListCalls::set(IOrderedList::setCall {
-        numbers: numbers.into(),
+        numbers,
         seal: seal.into(),
     })
     .abi_encode();
