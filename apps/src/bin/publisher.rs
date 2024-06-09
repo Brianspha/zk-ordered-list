@@ -133,7 +133,7 @@ fn main() -> Result<()> {
     // Decode Journal: Upon receiving the proof, the application decodes the journal to extract
     // the verified number. This ensures that the number being submitted to the blockchain matches
     // the number that was verified off-chain.
-    let numbers:Vec<U256> = <Vec<U256>>::abi_decode(&journal, true).context("decoding journal data")?;
+    let numbers = <Vec<U256>>::abi_decode(&journal, true).context("decoding journal data")?;
 
     // Construct function call: Using the IOrderedList interface, the application constructs
     // the ABI-encoded function call for the set function of the EvenNumber contract.
