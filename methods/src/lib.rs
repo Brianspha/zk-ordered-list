@@ -22,32 +22,41 @@ mod tests {
     use risc0_zkvm::{default_executor, ExecutorEnv};
 
     #[test]
-    fn proves_even_number() {
-        let even_number = U256::from(1304);
-
+    fn proves_ordered_numbers() {
+        let numbers: Vec<alloy_primitives::Uint<256, 4>> = vec![
+            U256::from(1304),
+            U256::from(1303),
+            U256::from(1302),
+            U256::from(1301),
+        ];
         let env = ExecutorEnv::builder()
-            .write_slice(&even_number.abi_encode())
+            .write_slice(&numbers.abi_encode())
             .build()
             .unwrap();
 
         // NOTE: Use the executor to run tests without proving.
-        let session_info = default_executor().execute(env, super::IS_EVEN_ELF).unwrap();
-
-        let x = U256::abi_decode(&session_info.journal.bytes, true).unwrap();
-        assert_eq!(x, even_number);
+        let session_info: risc0_zkvm::SessionInfo = default_executor()
+            .execute(env, super::ORDERED_LIST_ELF)
+            .unwrap();
+        let x: Vec<alloy_primitives::Uint<256, 4>> =
+            <Vec<U256>>::abi_decode(&session_info.journal.bytes, true).unwrap();
+        assert_eq!(x, numbers);
     }
-
     #[test]
-    #[should_panic(expected = "number is not even")]
-    fn rejects_odd_number() {
-        let odd_number = U256::from(75);
-
+    #[should_panic = "list is not ordered"]
+    fn proves_unordered_numbers() {
+        let numbers: Vec<alloy_primitives::Uint<256, 4>> = vec![
+            U256::from(1303),
+            U256::from(1304),
+            U256::from(1302),
+            U256::from(1301),
+        ];
         let env = ExecutorEnv::builder()
-            .write_slice(&odd_number.abi_encode())
+            .write_slice(&numbers.abi_encode())
             .build()
             .unwrap();
-
-        // NOTE: Use the executor to run tests without proving.
-        default_executor().execute(env, super::IS_EVEN_ELF).unwrap();
+        default_executor()
+            .execute(env, super::ORDERED_LIST_ELF)
+            .unwrap();
     }
 }

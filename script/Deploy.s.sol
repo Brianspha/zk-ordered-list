@@ -22,7 +22,7 @@ import {IRiscZeroVerifier} from "risc0/IRiscZeroVerifier.sol";
 import {RiscZeroGroth16Verifier} from "risc0/groth16/RiscZeroGroth16Verifier.sol";
 import {ControlID} from "risc0/groth16/ControlID.sol";
 
-import {EvenNumber} from "../contracts/EvenNumber.sol";
+import {OrderedList} from "../contracts/OrderedList.sol";
 
 /// @notice Deployment script for the RISC Zero starter project.
 /// @dev Use the following environment variable to control the deployment:
@@ -30,7 +30,7 @@ import {EvenNumber} from "../contracts/EvenNumber.sol";
 ///
 /// See the Foundry documentation for more information about Solidity scripts.
 /// https://book.getfoundry.sh/tutorials/solidity-scripting
-contract EvenNumberDeploy is Script {
+contract OrderedListDeploy is Script {
     function run() external {
         uint256 deployerKey = uint256(vm.envBytes32("ETH_WALLET_PRIVATE_KEY"));
 
@@ -39,8 +39,8 @@ contract EvenNumberDeploy is Script {
         IRiscZeroVerifier verifier = new RiscZeroGroth16Verifier(ControlID.CONTROL_ROOT, ControlID.BN254_CONTROL_ID);
         console2.log("Deployed RiscZeroGroth16Verifier to", address(verifier));
 
-        EvenNumber evenNumber = new EvenNumber(verifier);
-        console2.log("Deployed EvenNumber to", address(evenNumber));
+        OrderedList OrderedList = new OrderedList(verifier);
+        console2.log("Deployed OrderedList to", address(OrderedList));
 
         vm.stopBroadcast();
     }

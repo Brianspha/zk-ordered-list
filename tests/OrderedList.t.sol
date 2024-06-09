@@ -20,31 +20,42 @@ import {RiscZeroCheats} from "risc0/test/RiscZeroCheats.sol";
 import {console2} from "forge-std/console2.sol";
 import {Test} from "forge-std/Test.sol";
 import {IRiscZeroVerifier} from "risc0/IRiscZeroVerifier.sol";
-import {EvenNumber} from "../contracts/EvenNumber.sol";
+import {OrderedList} from "../contracts/OrderedList.sol";
 import {Elf} from "./Elf.sol"; // auto-generated contract after running `cargo build`.
 
-contract EvenNumberTest is RiscZeroCheats, Test {
-    EvenNumber public evenNumber;
+contract OrderedListTest is RiscZeroCheats, Test {
+    OrderedList public orderedList;
 
     function setUp() public {
         IRiscZeroVerifier verifier = deployRiscZeroVerifier();
-        evenNumber = new EvenNumber(verifier);
-        assertEq(evenNumber.get(), 0);
+        orderedList = new OrderedList(verifier);
+        assertEq(orderedList.get().length, 0);
     }
 
-    function test_SetEven() public {
-        uint256 number = 12345678;
-        (bytes memory journal, bytes memory seal) = prove(Elf.IS_EVEN_PATH, abi.encode(number));
+    function test_SetSorted() public {
+        uint256[] memory numbers = new uint256[](5);
+        numbers[0] = 5;
+        numbers[1] = 4;
+        numbers[2] = 3;
+        numbers[3] = 2;
+        numbers[4] = 1;
+        (bytes memory journal, bytes memory seal) = prove(
+            Elf.ORDERED_LIST_PATH,
+            abi.encode(numbers)
+        );
 
-        evenNumber.set(abi.decode(journal, (uint256)), seal);
-        assertEq(evenNumber.get(), number);
+        orderedList.set(abi.decode(journal, (uint256[])), seal);
+        assertEq(orderedList.get(), numbers);
     }
 
-    function test_SetZero() public {
-        uint256 number = 0;
-        (bytes memory journal, bytes memory seal) = prove(Elf.IS_EVEN_PATH, abi.encode(number));
+    function SetZero() public {
+         uint256[] memory numbers = new uint256[](0);
+        (bytes memory journal, bytes memory seal) = prove(
+            Elf.ORDERED_LIST_PATH,
+            abi.encode(numbers)
+        );
 
-        evenNumber.set(abi.decode(journal, (uint256)), seal);
-        assertEq(evenNumber.get(), number);
+        orderedList.set(abi.decode(journal, (uint256[])), seal);
+        assertEq(orderedList.get().length, 0);
     }
 }
